@@ -3,67 +3,89 @@ import sys
 import os
 import signal
 
-   
-print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ")
-print("+  _____ ___             __  __ __    ___    __  __  _    ___  ____   + ")
-print("+ / ___/|   \           /  ]|  |  |  /  _]  /  ]|  |/ ]  /  _]|    \  + ")
-print("+(   \_ |    \  _____  /  / |  |  | /  [_  /  / |  ' /  /  [_ |  D  ) + ")
-print("+ \__  ||  D  ||     |/  /  |  _  ||    _]/  /  |    \ |    _]|    /  + ")
-print("+ /  \ ||     ||_____/   \_ |  |  ||   [_/   \_ |     \|   [_ |    \  + ")
-print("+ \    ||     |      \     ||  |  ||     \     ||  .  ||     ||  .  \ + ")
-print("+  \___||_____|       \____||__|__||_____|\____||__|\_||_____||__|\_| + ")
-print("+                  ------------ By. sh3r1 ---------------             + ")
-print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ")
+from datetime import datetime
 
-if sys.version_info < (3, 0):
-    sys.stdout.write("Sorry, sd-checker requires Python 3.x\n")
-    sys.exit(1)
+def banner():
+    print(B+ """
+      _____ ___             __  __ __    ___    __  __  _    ___  ____   
+     / ___/|   \           /  ]|  |  |  /  _]  /  ]|  |/ ]  /  _]|    \  
+    (   \_ |    \  _____  /  / |  |  | /  [_  /  / |  ' /  /  [_ |  D  ) 
+     \__  ||  D  ||     |/  /  |  _  ||    _]/  /  |    \ |    _]|    /  
+     /  \ ||     ||_____/   \_ |  |  ||   [_/   \_ |     \|   [_ |    \  
+     \    ||     |      \     ||  |  ||     \     ||  .  ||     ||  .  \ 
+      \___||_____|       \____||__|__||_____|\____||__|\_||_____||__|\_|
+
+                                  By: sh3r1
+    """ + B)
+
+
+# Console Colors based from https://github.com/aboul3la/Sublist3r
+# Check if we are running this on windows platform
+is_windows = sys.platform.startswith('win')
+
+# Console Colors
+if is_windows:
+    # Windows deserves coloring too :D
+    G = '\033[92m'  # green
+    Y = '\033[93m'  # yellow
+    B = '\033[94m'  # blue
+    R = '\033[91m'  # red
+    W = '\033[0m'   # white
+    try:
+        import win_unicode_console , colorama
+        win_unicode_console.enable()
+        colorama.init()
+        #Now the unicode will work ^_^
+    except:
+        print("[!] Error: Coloring libraries not installed, no coloring will be used [Check the readme]")
+        G = Y = B = R = W = G = Y = B = R = W = ''
+
+else:
+    G = '\033[92m'  # green
+    Y = '\033[93m'  # yellow
+    B = '\033[94m'  # blue
+    R = '\033[91m'  # red
+    W = '\033[0m'   # white
+
+
+def error_parse(error):
+    banner()
+    print("Usage: python " + sys.argv[0] )
+    print("Error: " + error)
+    sys.exit()
+
     
 def main():
-
-    try:
-        # first argument - text file for subdomain
-        # ex: subdomain.txt
-        file = sys.argv[1]
-     
-        with open(file) as f:
-            for line in f:
-                try:
-                    response('http://',line.strip())
-                    
-                except:
-                    print("Trying https..")
-                    response('https://',line.strip())
-    except KeyboardInterrupt:
-        sys.exit(0)
-            
+    
+    banner()
+    
+    # first argument - text file for subdomain
+    # ex: subdomain.txt
+    file = sys.argv[1]
+    with open(file) as f:
+        for line in f:
+            #try:
+            response('http://',line.strip())
+            #except:
+                #response('https://',line.strip())
+    
                 
 
 def response(schema,subdomain):
-
-    
-    if(schema == 'http'):
+    try:
         url = schema + subdomain
         res = requests.get(url,verify=True)
-        print(url + ' = ' + str(res.status_code))
-        print("")
-    else:
-        try:
-            url = schema + subdomain
-            res = requests.get(url,verify=True)
-            print(url + ' = ' + str(res.status_code))
-            print("")
-        except:
-            print(url + ' = not found')
-            print("")
+        print(G + '[' + str(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) + '] - ' + url + ' = ' + str(res.status_code) + G)
+    except :
+        print(R + '[' + str(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) + '] - ' + url + ' = Not Found'  + R)
+        #urls = 'https://' + subdomain
+        #ress = requests.get(urls,verify=True)
+        #print(Y + urls + Y)
+        #print(G + '[' + str(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) + '] - ' + urls + ' = ' + str(ress.status_code) + G)
+    
+    
+   
     
 
 if __name__ == '__main__':
-    #try:
-        main()
-    #except KeyboardInterrupt:
-       # sys.exit(0)
-
-        
-        
-     
+    main()
